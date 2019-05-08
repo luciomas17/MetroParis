@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.javadocmd.simplelatlng.LatLng;
 
@@ -42,8 +43,8 @@ public class MetroDAO {
 	}
 
 	public List<Linea> getAllLinee() {
+		
 		final String sql = "SELECT id_linea, nome, velocita, intervallo FROM linea ORDER BY nome ASC";
-
 		List<Linea> linee = new ArrayList<Linea>();
 
 		try {
@@ -68,5 +69,59 @@ public class MetroDAO {
 		return linee;
 	}
 
+	public boolean esisteConnessione(Fermata partenza, Fermata arrivo) {
+		
+		final String sql = "SELECT COUNT(*) AS cnt FROM connessione " +
+				"WHERE id_stazP = ? AND id_stazA = ?" ;
+		int num = 0;
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, partenza.getIdFermata());
+			st.setInt(2, arrivo.getIdFermata());
+			ResultSet rs = st.executeQuery();
 
+			rs.next();
+			
+			num = rs.getInt("cnt");
+
+			st.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Errore di connessione al Database.");
+		}
+		
+		if(num != 0)
+			return true;
+		else
+			return false;
+	}
+
+	public List<Fermata> stazioniArrivo(Fermata partenza, Map<Integer, Fermata> idMap) {
+		
+		final String sql = "SELECT id_stazA from connessione WHERE id_stazP = ?";
+		List<Fermata> result = new ArrayList<Fermata>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, partenza.getIdFermata());
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next())
+				result.add(idMap.get(rs.getInt("id_stazA")));
+			
+			st.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Errore di connessione al Database.");
+		}
+		
+		return result;
+	}
 }
