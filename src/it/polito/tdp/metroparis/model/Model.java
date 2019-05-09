@@ -56,7 +56,7 @@ public class Model {
 	private Graph<Fermata, DefaultEdge> grafo;
 	private List<Fermata> fermate;
 	private Map<Integer, Fermata> fermateIdMap;
-	Map<Fermata, Fermata> backVisit;
+	private Map<Fermata, Fermata> backVisit;
 	
 	public void creaGrafo() {
 		// Creo l'oggetto grafo
