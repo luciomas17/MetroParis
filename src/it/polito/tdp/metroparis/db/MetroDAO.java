@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.javadocmd.simplelatlng.LatLng;
 
+import it.polito.tdp.metroparis.model.ConnessioneVelocita;
 import it.polito.tdp.metroparis.model.Fermata;
 import it.polito.tdp.metroparis.model.Linea;
 
@@ -124,4 +125,32 @@ public class MetroDAO {
 		
 		return result;
 	}
+	
+	public List<ConnessioneVelocita> getConnessioniVelocita() {
+		
+		final String sql = "SELECT c.id_stazP, c.id_stazA, MIN(l.velocita) AS velocita " + 
+				"FROM connessione c, linea l " + 
+				"WHERE c.id_linea = l.id_linea " + 
+				"GROUP BY c.id_stazP, c.id_stazA";
+		List<ConnessioneVelocita> result = new ArrayList<>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next())
+				result.add(new ConnessioneVelocita(rs.getInt("id_stazP"), rs.getInt("id_stazA"), rs.getDouble("velocita")));
+			
+			st.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Errore di connessione al Database.");
+		}
+		
+		return result;
+	}
+	
 }

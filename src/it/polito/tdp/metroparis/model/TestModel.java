@@ -22,6 +22,10 @@ public class TestModel {
 		List<Fermata> percorso = model.percorsoFinoA(target);
 		System.out.println("Arrivo a: " + target);
 		System.out.println(percorso);
+		
+		List<Fermata> camminoMinimo = model.trovaCamminoMinimo(source, target);
+		System.out.println("Cammino minimo:");
+		System.out.println(camminoMinimo);
 	}
 
 }
